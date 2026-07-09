@@ -44,7 +44,7 @@ async def verify_admin(uid: str = Depends(verify_token)) -> str:
     try:
         db = firestore_async.client()
         user_doc = await db.collection("users").document(uid).get()
-        if not user_doc.exists or user_doc.get("role") != "admin":
+        if not user_doc.exists or user_doc.to_dict().get("role") != "admin":
             raise HTTPException(
                 status_code=status.HTTP_403_FORBIDDEN,
                 detail="Admin privileges required.",

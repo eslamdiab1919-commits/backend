@@ -53,7 +53,7 @@ async def upload_file_to_vector_store(
         )
     logger.info("Uploaded file to OpenAI Files: %s (%s)", uploaded.id, filename)
 
-    vs_file = await client.beta.vector_stores.files.create(
+    vs_file = await client.vector_stores.files.create(
         vector_store_id,
         file_id=uploaded.id,
     )
@@ -87,9 +87,9 @@ async def list_vector_store_files(limit: int = 100, after: str | None = None) ->
     vector_store_id = config.OPENAI_VECTOR_STORE_ID
 
     if after:
-        page = await client.beta.vector_stores.files.list(vector_store_id, limit=limit, after=after)
+        page = await client.vector_stores.files.list(vector_store_id, limit=limit, after=after)
     else:
-        page = await client.beta.vector_stores.files.list(vector_store_id, limit=limit)
+        page = await client.vector_stores.files.list(vector_store_id, limit=limit)
 
     vs_files = list(page.data)
     
@@ -132,7 +132,7 @@ async def delete_file_from_vector_store(file_id: str) -> None:
     vector_store_id = config.OPENAI_VECTOR_STORE_ID
 
     try:
-        await client.beta.vector_stores.files.delete(file_id=file_id, vector_store_id=vector_store_id)
+        await client.vector_stores.files.delete(file_id=file_id, vector_store_id=vector_store_id)
         logger.info("Removed file %s from Vector Store %s", file_id, vector_store_id)
 
         await client.files.delete(file_id)
