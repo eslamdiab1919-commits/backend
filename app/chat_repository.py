@@ -96,6 +96,16 @@ async def save_user_message(
         .document(session_id)
     )
     batch.set(session_ref, {"lastMessageAt": firestore.SERVER_TIMESTAMP}, merge=True)
+    # Denormalize the activity marker on the user document so the dashboard
+    # can page recent users without scanning every chat subcollection.
+    batch.set(
+        db.collection("users").document(uid),
+        {
+            "lastMessageAt": firestore.SERVER_TIMESTAMP,
+            "lastChatId": session_id,
+        },
+        merge=True,
+    )
 
     await batch.commit()
     return msg_ref.id
@@ -133,5 +143,13 @@ async def save_assistant_message(
         .document(session_id)
     )
     batch.set(session_ref, {"lastMessageAt": firestore.SERVER_TIMESTAMP}, merge=True)
+    batch.set(
+        db.collection("users").document(uid),
+        {
+            "lastMessageAt": firestore.SERVER_TIMESTAMP,
+            "lastChatId": session_id,
+        },
+        merge=True,
+    )
 
     await batch.commit()
